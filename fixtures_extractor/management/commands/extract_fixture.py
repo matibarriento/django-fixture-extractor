@@ -12,11 +12,13 @@ from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
 
-logger = logging.getLogger('')
+from fixtures_extractor.extra_logging_formatter import ExtraFormatter
+
+logger = logging.getLogger('extract_fixture')
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 console.setFormatter(
-    logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    ExtraFormatter('%(name)s - %(levelname)s - %(message)s')
 )
 logger.addHandler(console)
 
@@ -34,10 +36,6 @@ class EnhancedDjangoJSONEncoder(DjangoJSONEncoder):
 
 
 class Command(BaseCommand):
-
-    def __init__(self, stdout=None, stderr=None, no_color=False):
-        self.output_file_prefix = 1
-        super().__init__(stdout, stderr, no_color)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -72,67 +70,59 @@ class Command(BaseCommand):
         primary_ids = options.get("primary_ids")
         output_dir = Path(options.get("output_dir"))
 
-        for model, schema in schema_config.items():
-            if model.startswith("."):
-                continue
+        for primary_id in primary_ids:
 
-            for primary_id in primary_ids:
+            for model, schema in schema_config.items():
+                if model.startswith("."):
+                    continue
+
+                initial_app_model = schema["model_name"]
                 primary_output_dir = output_dir.joinpath(f"{model.lower()}_{primary_id}")
                 primary_output_dir.mkdir(parents=True, exist_ok=True)
+                output_file = primary_output_dir.joinpath(f"{initial_app_model}.json")
 
-                self.process_schema(
+                records = self.process_schema(
                     schema=schema,
                     filter_value=primary_id,
                     output_dir=primary_output_dir,
                 )
-                self.output_file_prefix = 1
 
-    def process_schema(self, schema, filter_value, output_dir):
+                self.dump_records(output_file=output_file, records=records)
+
+    def process_schema(self, schema: dict, filter_value: str, output_dir: Path) -> list:
+        schema_records = []
         app_model = schema["model_name"]
         filter_key = schema.get("filter_key", None)
 
         logger.info(app_model)
 
-        self.dump_fixture(
-            app_model=app_model,
-            filter_key=filter_key,
-            filter_value=filter_value,
-            output_dir=output_dir,
+        base_model_records = self.get_records(
+            app_model=app_model, filter_key=filter_key,
+            filter_value=filter_value
         )
+        jsonfy_records = self.build_records(app_model, base_model_records)
+        schema_records.extend(jsonfy_records)
 
         if "parent" in schema:
-            self.process_schema(
+            parent_records = self.process_schema(
                 schema=schema["parent"],
                 filter_value=filter_value,
                 output_dir=output_dir,
             )
+            schema_records.extend(parent_records)
 
         if "dependencies" in schema:
             for _, dep_schema in schema["dependencies"].items():
-                self.process_schema(
+                dependency_records = self.process_schema(
                     schema=dep_schema,
                     filter_value=filter_value,
                     output_dir=output_dir,
                 )
+                schema_records.extend(dependency_records)
 
-    def dump_fixture(self, app_model, filter_key, filter_value, output_dir):
-        records = self.get_records(
-            app_model=app_model, filter_key=filter_key,
-            filter_value=filter_value
-        )
-        output_file = self.make_output_name(
-            app_model, output_dir, self.output_file_prefix
-        )
-        self.dump_records(
-            app_model=app_model, output_file=output_file, records=records
-        )
+        return schema_records
 
-        self.output_file_prefix += 1
-
-    def make_output_name(self, app_model, output_dir, prefix):
-        return output_dir.joinpath(f"{prefix}_{app_model}.json")
-
-    def get_records(self, app_model, filter_key, filter_value):
+    def get_records(self, app_model: str, filter_key: str, filter_value: str):
         # noinspection PyPep8Naming
         Model = apps.get_model(app_model)
         fields = self.get_all_fields(Model)
@@ -144,16 +134,15 @@ class Command(BaseCommand):
 
         return records.values(*fields)
 
-    def dump_records(self, app_model, output_file, records):
-        dump_structure = self.get_dump_structure(app_model, records)
-        result = json.dumps(
-            dump_structure, cls=EnhancedDjangoJSONEncoder, indent=4
-        )
+    def dump_records(self, records: list, output_file: Path):
         logger.info(output_file)
+        jsonfy_records = json.dumps(
+            records, cls=EnhancedDjangoJSONEncoder, indent=4
+        )
         with open(output_file, "w+") as output:
-            output.write(result)
+            output.writelines(jsonfy_records)
 
-    def get_dump_structure(self, app_model, records):
+    def build_records(self, app_model: str, records: list) -> list:
         results = []
         for item in records:
             values = {}

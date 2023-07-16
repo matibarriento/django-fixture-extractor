@@ -24,6 +24,7 @@ class AlbumFactory(DjangoModelFactory):
         model = Album
 
     artist = SubFactory(MusicianFactory)
+    name = factory.fuzzy.FuzzyText(length=50)
     release_date = factory.fuzzy.FuzzyDate(start_date=date(2019, 8, 3))
 
 

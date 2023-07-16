@@ -31,27 +31,18 @@ Add it to your `INSTALLED_APPS`:
 
     INSTALLED_APPS = (
         ...
-        'fixtures_extractor.apps.FixturesExtractorConfig',
+        'fixtures_extractor',
         ...
     )
-
-Add Django Fixtures Extractor's URL patterns:
-
-.. code-block:: python
-
-    from fixtures_extractor import urls as fixtures_extractor_urls
-
-
-    urlpatterns = [
-        ...
-        url(r'^', include(fixtures_extractor_urls)),
-        ...
-    ]
 
 Features
 --------
 
-* TODO
+* Autocreate schema
+* Make tests
+* Ofuscate value
+* Add supported model fields
+* Fix tox and pyenv
 
 Running Tests
 -------------
@@ -61,8 +52,7 @@ Does the code actually work?
 ::
 
     source <YOURVIRTUALENV>/bin/activate
-    (myenv) $ pip install tox
-    (myenv) $ tox
+    (myenv) $ python runtests.py
 
 
 Development commands
@@ -70,7 +60,7 @@ Development commands
 
 ::
 
-    pip install -r requirements_dev.txt
+    pip install -r requirements/requirements_dev.txt
     invoke -l
 
 
