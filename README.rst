@@ -38,11 +38,12 @@ Add it to your `INSTALLED_APPS`:
 Features
 --------
 
-* Autocreate schema
-* Make tests
-* Ofuscate value
+* Make manage.py run for tests project
+* Make more tests
 * Add supported model fields
-* Fix tox and pyenv
+* Add feature: Ofuscate value
+* Add feature: Generate schema
+* Fix tox and pyenv to work together
 
 Running Tests
 -------------
@@ -61,8 +62,6 @@ Development commands
 ::
 
     pip install -r requirements/requirements_dev.txt
-    invoke -l
-
 
 Credits
 -------
