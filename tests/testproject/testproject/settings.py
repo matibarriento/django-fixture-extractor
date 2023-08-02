@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 'testapp',
-    # 'testproject.testapp',
     'tests.testproject.testapp',
     'fixtures_extractor',
 ]
@@ -56,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'testproject.urls'
+ROOT_URLCONF = 'tests.testproject.testproject.urls'
 
 TEMPLATES = [
     {
@@ -73,8 +71,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'testproject.wsgi.application'
 
 
 # Database
