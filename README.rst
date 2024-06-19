@@ -42,7 +42,7 @@ Features
     * Many to Many
     * Many to Many with `through <https://docs.djangoproject.com/en/4.2/ref/models/fields/#django.db.models.ManyToManyField.through>`_ model
 * Make more tests
-* Add feature: Ofuscate value
+* Add feature: Obfuscate value
 * Add feature: Generate schema from model
 * Fix tox and pyenv to work together
 
@@ -63,6 +63,7 @@ Development commands
 ::
 
     pip install -r requirements/requirements_dev.txt
+    pip install -r requirements/requirements_test.txt
 
 Credits
 -------
