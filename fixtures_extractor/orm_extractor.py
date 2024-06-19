@@ -41,8 +41,20 @@ class ORMExtractor:
 
         return results
 
+    def get_all_model_attributes(self, Model):
+        return (
+            self.get_fields(Model)
+            + self.get_many_to_many_relations(Model)
+            + self.get_reverse_relations(Model)
+        )
+
     def get_fields(self, Model):
         return [field.name for field in Model._meta.fields]
 
-    def get_many_to_many(self, Model):
+    def get_many_to_many_relations(self, Model):
         return [m2m.name for m2m in Model._meta.many_to_many]
+
+    def get_reverse_relations(self, Model):
+        return [
+            relation.get_accessor_name() for relation in Model._meta.related_objects
+        ]
