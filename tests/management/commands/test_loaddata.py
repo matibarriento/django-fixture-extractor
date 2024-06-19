@@ -4,7 +4,7 @@ import pytest
 from django.core.management import call_command
 from django.core.serializers.base import DeserializationError
 
-from tests.factories import MusicianFactory, AlbumFactory
+from tests.testproject.testapp.factories import MusicianFactory, AlbumFactory
 from tests.management.commands.utils import date_repr
 from tests.testproject.testapp.models import Musician, Album
 

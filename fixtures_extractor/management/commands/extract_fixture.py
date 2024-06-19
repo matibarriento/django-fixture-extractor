@@ -125,7 +125,7 @@ class Command(BaseCommand):
     def get_records(self, app_model: str, filter_key: str, filter_value: str):
         # noinspection PyPep8Naming
         Model = apps.get_model(app_model)
-        fields = self.get_all_fields(Model)
+        fields = self.get_fields(Model)
 
         records = Model.objects.all()
 
@@ -158,5 +158,8 @@ class Command(BaseCommand):
 
         return results
 
-    def get_all_fields(self, Model):
+    def get_fields(self, Model):
         return [field.name for field in Model._meta.fields]
+
+    def get_many_to_many(self, Model):
+        return [m2m.name for m2m in Model._meta.many_to_many]

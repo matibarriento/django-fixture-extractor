@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from django.core.management import call_command
 
-from tests.factories import MusicianFactory, AlbumFactory
+from tests.testproject.testapp.factories import MusicianFactory, AlbumFactory
 from tests.management.commands.utils import date_repr, assert_fixture_output_file
 
 pytestmark = [pytest.mark.django_db]

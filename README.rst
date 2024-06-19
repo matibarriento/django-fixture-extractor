@@ -38,11 +38,12 @@ Add it to your `INSTALLED_APPS`:
 Features
 --------
 
-* Make manage.py run for tests project
-* Make more tests
 * Add supported model fields
+    * Many to Many
+    * Many to Many with `through <https://docs.djangoproject.com/en/4.2/ref/models/fields/#django.db.models.ManyToManyField.through>`_ model
+* Make more tests
 * Add feature: Ofuscate value
-* Add feature: Generate schema
+* Add feature: Generate schema from model
 * Fix tox and pyenv to work together
 
 Running Tests

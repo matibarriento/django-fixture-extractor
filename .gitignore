@@ -152,3 +152,5 @@ docs/
 # Running local will generate this folder
 fixtures/
 
+# Databases
+**/database.db
