@@ -6,7 +6,7 @@ from django.apps import apps
 
 from fixtures_extractor.encoders import EnhancedDjangoJSONEncoder
 
-logger = logging.getLogger("extract_fixture")
+logger = logging.getLogger("extract_fixture_with_schema")
 
 
 class ORMExtractor:
