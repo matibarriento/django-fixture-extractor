@@ -1,5 +1,0 @@
----
-
-Musician:
-  filter_key: id
-  model_name: testapp.musician

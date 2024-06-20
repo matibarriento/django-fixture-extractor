@@ -1,13 +1,13 @@
 import pytest
 
 from fixtures_extractor.orm_extractor import ORMExtractor
-from tests.testproject.testapp.models import Musician, Album, Song
+from tests.testproject.testapp.models import Artist, Album, Song
 
 
 @pytest.mark.parametrize(
     "Model, expected_fields",
     [
-        (Musician, ["id", "first_name", "last_name", "instrument"]),
+        (Artist, ["id", "first_name", "last_name", "instrument"]),
         (Album, ["id", "artist", "name", "release_date"]),
         (Song, ["id", "album", "name", "release_date"]),
     ],
@@ -23,7 +23,7 @@ def test_discover_fields(Model, expected_fields):
 @pytest.mark.parametrize(
     "Model, expected_m2m_fields",
     [
-        (Musician, []),
+        (Artist, []),
         (Album, []),
         (Song, ["artists"]),
     ],
@@ -39,7 +39,7 @@ def test_discover_m2m_fields(Model, expected_m2m_fields):
 @pytest.mark.parametrize(
     "Model, expected_relation_fields",
     [
-        (Musician, ["albums", "songs"]),
+        (Artist, ["albums", "songs"]),
         (Album, ["songs"]),
         (Song, []),
     ],
@@ -55,7 +55,7 @@ def test_get_revere_relations(Model, expected_relation_fields):
 @pytest.mark.parametrize(
     "Model, expected_attributes",
     [
-        (Musician, ["id", "first_name", "last_name", "instrument", "albums", "songs"]),
+        (Artist, ["id", "first_name", "last_name", "instrument", "albums", "songs"]),
         (Album, ["id", "artist", "name", "release_date", "songs"]),
         (Song, ["id", "album", "name", "release_date", "artists"]),
     ],

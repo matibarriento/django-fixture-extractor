@@ -1,9 +1,0 @@
----
-
-Album:
-  filter_key: id
-  model_name: testapp.album
-  dependencies:
-    Musician:
-      filter_key: albums__id
-      model_name: testapp.musician

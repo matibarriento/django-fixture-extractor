@@ -5,14 +5,14 @@ from factory import SubFactory, post_generation
 from factory.django import DjangoModelFactory
 from faker import Factory
 
-from tests.testproject.testapp.models import Musician, Album, Song
+from tests.testproject.testapp.models import Artist, Album, Song
 
 faker = Factory.create()
 
 
-class MusicianFactory(DjangoModelFactory):
+class ArtistFactory(DjangoModelFactory):
     class Meta:
-        model = Musician
+        model = Artist
 
     first_name = factory.fuzzy.FuzzyText(length=50)
     last_name = factory.fuzzy.FuzzyText(length=50)
@@ -23,7 +23,7 @@ class AlbumFactory(DjangoModelFactory):
     class Meta:
         model = Album
 
-    artist = SubFactory(MusicianFactory)
+    artist = SubFactory(ArtistFactory)
     name = factory.fuzzy.FuzzyText(length=50)
     release_date = factory.fuzzy.FuzzyDate(start_date=date(2019, 8, 3))
 
