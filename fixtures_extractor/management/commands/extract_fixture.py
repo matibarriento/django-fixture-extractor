@@ -27,6 +27,7 @@ class Command(BaseCommand):
             "--app",
             type=str,
             help="App of the start model to dump",
+            required=True,
         )
         parser.add_argument(
             "-m",
@@ -68,7 +69,7 @@ class Command(BaseCommand):
             records = self.process_declared_fields(
                 full_model_name=full_model_name,
                 filter_key=filter_key,
-                filter_value=primary_id,
+                filter_value=str(primary_id),
                 history=[],
                 origin=full_model_name,
             )
@@ -94,12 +95,16 @@ class Command(BaseCommand):
             app_model=full_model_name, filter_key=filter_key, filter_value=filter_value
         )
         jsonfy_records = orm_extractor.build_records(
-            full_model_name, base_model_records
+            app_model=full_model_name, records=base_model_records
         )
         schema_records.extend(jsonfy_records)
 
-        declared_fields = orm_extractor.get_model_declared_relations(full_model_name)
-        target_fields = orm_extractor.get_model_target_relations(full_model_name)
+        declared_fields = orm_extractor.get_model_declared_relations(
+            app_model=full_model_name
+        )
+        target_fields = orm_extractor.get_model_target_relations(
+            app_model=full_model_name
+        )
 
         for record in base_model_records:
             for declared_field in declared_fields:

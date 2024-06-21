@@ -14,8 +14,8 @@ logger = logging.getLogger()
 class ORMExtractor:
     def get_records(self, app_model: str, filter_key: str, filter_value: str):
         model = apps.get_model(app_model)
-        fields = self.get_model_fields(model)
-        relation_fields = self.get_model_declared_relations(app_model)
+        fields = self.get_model_fields(app_model=app_model)
+        relation_fields = self.get_model_declared_relations(app_model=app_model)
         field_names = [field.field_name for field in fields]
         relation_field_names = [field.field_name for field in relation_fields]
 
@@ -45,46 +45,43 @@ class ORMExtractor:
 
         return results
 
-    def get_all_fields(self, Model):
+    def get_all_fields(self, app_model):
+        model = apps.get_model(app_label=app_model)
         return sorted(
-            [ModelFieldMetaDTO.build(field) for field in Model._meta.get_fields()]
+            [ModelFieldMetaDTO.build(field=field) for field in model._meta.get_fields()]
         )
 
-    def get_model_fields(self, Model) -> list[ModelFieldMetaDTO]:
+    def get_model_fields(self, app_model) -> list[ModelFieldMetaDTO]:
         return [
             field
-            for field in self.get_all_fields(Model)
+            for field in self.get_all_fields(app_model=app_model)
             if field.field_type == FieldType.field
         ]
 
-    def get_many_to_many_relations(self, Model) -> list[ModelFieldMetaDTO]:
+    def get_many_to_many_relations(self, app_model) -> list[ModelFieldMetaDTO]:
         return [
             field
-            for field in self.get_all_fields(Model)
+            for field in self.get_all_fields(app_model=app_model)
             if field.field_type == FieldType.many_to_many
         ]
 
-    def get_reverse_relations(self, Model) -> list[ModelFieldMetaDTO]:
+    def get_reverse_relations(self, app_model) -> list[ModelFieldMetaDTO]:
         return [
             field
-            for field in self.get_all_fields(Model)
+            for field in self.get_all_fields(app_model=app_model)
             if field.field_type == FieldType.reverse_foreign_key
         ]
 
     def get_model_declared_relations(self, app_model) -> list[ModelFieldMetaDTO]:
-        model = apps.get_model(app_model)
-
         return [
             field
-            for field in self.get_all_fields(model)
+            for field in self.get_all_fields(app_model=app_model)
             if field.is_model_declared and field.field_type != FieldType.field
         ]
 
     def get_model_target_relations(self, app_model) -> list[ModelFieldMetaDTO]:
-        model = apps.get_model(app_model)
-
         return [
             field
-            for field in self.get_all_fields(model)
+            for field in self.get_all_fields(app_model=app_model)
             if not field.is_model_declared and field.field_type != FieldType.field
         ]
