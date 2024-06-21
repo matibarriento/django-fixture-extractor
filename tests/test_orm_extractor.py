@@ -2,7 +2,7 @@ import pytest
 
 from fixtures_extractor.enums import FieldType
 from fixtures_extractor.orm_extractor import ModelFieldMetaDTO, ORMExtractor
-from tests.testproject.testapp.models import Album, Artist, Song
+from tests.testproject.testapp.models import Album, Artist, Song, RecordLabel
 
 
 @pytest.mark.parametrize(
@@ -37,15 +37,15 @@ from tests.testproject.testapp.models import Album, Artist, Song
                 ),
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="albums",
-                    model_name="artist",
+                    field_name="artist",
+                    model_name="album",
                     field_type=FieldType.reverse_foreign_key,
                     is_model_declared=False,
                 ),
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="songs",
-                    model_name="artist",
+                    field_name="artists",
+                    model_name="song",
                     field_type=FieldType.many_to_many,
                     is_model_declared=False,
                 ),
@@ -63,7 +63,7 @@ from tests.testproject.testapp.models import Album, Artist, Song
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="artist",
-                    model_name="album",
+                    model_name="artist",
                     field_type=FieldType.foreign_key,
                 ),
                 ModelFieldMetaDTO(
@@ -80,11 +80,17 @@ from tests.testproject.testapp.models import Album, Artist, Song
                 ),
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="songs",
-                    model_name="album",
+                    field_name="album",
+                    model_name="song",
                     field_type=FieldType.reverse_foreign_key,
                     is_model_declared=False,
                 ),
+                ModelFieldMetaDTO(
+                    app_name="testapp",
+                    field_name="record_label",
+                    model_name="recordlabel",
+                    field_type=FieldType.foreign_key,
+                )
             ],
         ),
         (
@@ -99,7 +105,7 @@ from tests.testproject.testapp.models import Album, Artist, Song
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="album",
-                    model_name="song",
+                    model_name="album",
                     field_type=FieldType.foreign_key,
                 ),
                 ModelFieldMetaDTO(
@@ -117,7 +123,7 @@ from tests.testproject.testapp.models import Album, Artist, Song
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="artists",
-                    model_name="song",
+                    model_name="artist",
                     field_type=FieldType.many_to_many,
                 ),
             ],
@@ -228,8 +234,8 @@ def test_get_model_fields(Model, expected_model_fields):
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="songs",
-                    model_name="artist",
+                    field_name="artists",
+                    model_name="song",
                     field_type=FieldType.many_to_many,
                     is_model_declared=False,
                 )
@@ -242,7 +248,7 @@ def test_get_model_fields(Model, expected_model_fields):
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="artists",
-                    model_name="song",
+                    model_name="artist",
                     field_type=FieldType.many_to_many,
                 )
             ],
@@ -265,8 +271,8 @@ def test_get_many_to_many_relations(Model, expected_m2m_fields):
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="albums",
-                    model_name="artist",
+                    field_name="artist",
+                    model_name="album",
                     field_type=FieldType.reverse_foreign_key,
                     is_model_declared=False,
                 ),
@@ -277,8 +283,8 @@ def test_get_many_to_many_relations(Model, expected_m2m_fields):
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="songs",
-                    model_name="album",
+                    field_name="album",
+                    model_name="song",
                     field_type=FieldType.reverse_foreign_key,
                     is_model_declared=False,
                 )
@@ -308,7 +314,14 @@ def test_get_reverse_relations(Model, expected_relation_fields):
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="artist",
-                    model_name="album",
+                    model_name="artist",
+                    field_type=FieldType.foreign_key,
+                    is_model_declared=True,
+                ),
+                ModelFieldMetaDTO(
+                    app_name="testapp",
+                    field_name="record_label",
+                    model_name="recordlabel",
                     field_type=FieldType.foreign_key,
                     is_model_declared=True,
                 ),
@@ -320,14 +333,14 @@ def test_get_reverse_relations(Model, expected_relation_fields):
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="artists",
-                    model_name="song",
+                    model_name="artist",
                     field_type=FieldType.many_to_many,
                     is_model_declared=True,
                 ),
                 ModelFieldMetaDTO(
                     app_name="testapp",
                     field_name="album",
-                    model_name="song",
+                    model_name="album",
                     field_type=FieldType.foreign_key,
                     is_model_declared=True,
                 ),
@@ -351,15 +364,15 @@ def test_get_model_declared_relations(app_model, expected_model_declared_relatio
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="albums",
-                    model_name="artist",
+                    field_name="artist",
+                    model_name="album",
                     field_type=FieldType.reverse_foreign_key,
                     is_model_declared=False,
                 ),
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="songs",
-                    model_name="artist",
+                    field_name="artists",
+                    model_name="song",
                     field_type=FieldType.many_to_many,
                     is_model_declared=False,
                 ),
@@ -370,8 +383,8 @@ def test_get_model_declared_relations(app_model, expected_model_declared_relatio
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
-                    field_name="songs",
-                    model_name="album",
+                    field_name="album",
+                    model_name="song",
                     field_type=FieldType.reverse_foreign_key,
                     is_model_declared=False,
                 ),

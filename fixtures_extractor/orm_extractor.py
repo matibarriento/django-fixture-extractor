@@ -15,14 +15,16 @@ class ORMExtractor:
     def get_records(self, app_model: str, filter_key: str, filter_value: str):
         model = apps.get_model(app_model)
         fields = self.get_model_fields(model)
+        relation_fields = self.get_model_declared_relations(app_model)
         field_names = [field.field_name for field in fields]
+        relation_field_names = [field.field_name for field in relation_fields]
 
         records = model.objects.all()
 
         if filter_key:
             records = records.filter(**{filter_key: filter_value}).all()
 
-        return records.values(*field_names)
+        return records.values(*field_names, *relation_field_names)
 
     def dump_records(self, records: list, output_file: Path):
         logger.info(output_file)

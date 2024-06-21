@@ -17,4 +17,11 @@ def assert_fixture_output_file(output_file: Path, expected_json: list):
 
     assert output_json == expected_json, (output_json, expected_json)
 
-    call_command('loaddata', output_file)
+    call_command("loaddata", output_file)
+
+
+def get_json_from_file(file_path: Path):
+    assert file_path.exists(), list(file_path.parent.glob("*"))
+
+    with open(file_path, "r") as file_content:
+        return json.load(file_content)

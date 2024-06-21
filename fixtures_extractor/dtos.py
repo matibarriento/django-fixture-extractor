@@ -15,12 +15,27 @@ class ModelFieldMetaDTO:
 
     @staticmethod
     def build(field):
+        app_name = field.model._meta.app_label
+        model_name = field.model._meta.model_name
+        field_name = field.name
+        field_type = ModelFieldMetaDTO._detect_field_type(field=field)
+        is_model_declared = ModelFieldMetaDTO._detect_model_declaration(field=field)
+
+        if is_model_declared and field_type != FieldType.field:
+            app_name = field.related_model._meta.app_label
+            model_name = field.related_model._meta.model_name
+
+        if field.is_relation and not is_model_declared:
+            app_name = field.related_model._meta.app_label
+            model_name = field.related_model._meta.model_name
+            field_name = field.field.name
+
         return ModelFieldMetaDTO(
-            app_name=field.model._meta.app_label,
-            field_name=field.name,
-            model_name=field.model._meta.model_name,
-            field_type=ModelFieldMetaDTO._detect_field_type(field),
-            is_model_declared=ModelFieldMetaDTO._detect_model_declaration(field),
+            app_name=app_name,
+            field_name=field_name,
+            model_name=model_name,
+            field_type=field_type,
+            is_model_declared=is_model_declared,
         )
 
     @classmethod
@@ -45,8 +60,6 @@ class ModelFieldMetaDTO:
     @classmethod
     def _detect_model_declaration(cls, field) -> bool:
         return not isinstance(field, ForeignObjectRel)
-
-    # ForeignObjectRel
 
     def __eq__(self, value: object) -> bool:
         if self.app_name != value.app_name:
