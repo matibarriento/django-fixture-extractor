@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand
 from fixtures_extractor.extra_logging_formatter import ExtraFormatter
 from fixtures_extractor.orm_extractor import ORMExtractor
 
-logger = logging.getLogger("extract_fixture_with_schema")
+logger = logging.getLogger("extract_fixture")
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 console.setFormatter(ExtraFormatter("%(name)s - %(levelname)s - %(message)s"))
@@ -66,19 +66,23 @@ class Command(BaseCommand):
             primary_output_dir.mkdir(parents=True, exist_ok=True)
             output_file = primary_output_dir.joinpath(f'{full_model_name}.json')
 
-            records = self.process_schema(
+            records = self.process_declared_fields(
                 full_model_name=full_model_name,
                 filter_key=filter_key,
                 filter_value=primary_id,
-                output_dir=primary_output_dir,
+                history=[],
+                origin=full_model_name,
             )
 
             orm_extractor.dump_records(output_file=output_file, records=records)
 
-    def process_schema(self, full_model_name: str, filter_key: str, filter_value: str, output_dir: Path) -> list:
-        schema_records = []
+    def process_declared_fields(self, full_model_name: str, filter_key: str, filter_value: str, history: list, origin: str) -> list:
+        print(history)
+        if (origin, full_model_name, filter_key, filter_value) in history:
+            return []
 
-        logger.info(full_model_name)
+        schema_records = []
+        history.append((origin, full_model_name, filter_key, filter_value))
 
         base_model_records = orm_extractor.get_records(
             app_model=full_model_name, filter_key=filter_key, filter_value=filter_value
@@ -86,18 +90,29 @@ class Command(BaseCommand):
         jsonfy_records = orm_extractor.build_records(full_model_name, base_model_records)
         schema_records.extend(jsonfy_records)
 
-        Model = apps.get_model(full_model_name)
+        declared_fields = orm_extractor.get_model_declared_relations(full_model_name)
+        target_fields = orm_extractor.get_model_target_relations(full_model_name)
 
-        for reverse_relation in Model._meta.related_objects:
-            reverse_app_name = reverse_relation.related_model._meta.app_label
-            reverse_model_name = reverse_relation.related_model._meta.model_name
+        for record in base_model_records:
+            for declared_field in declared_fields:
+                full_name = f'{declared_field.app_name}.{declared_field.model_name}'
+                dependency_records = self.process_declared_fields(
+                    full_model_name=full_name,
+                    filter_key='id',
+                    filter_value=record[declared_field.field_name],
+                    history=history,
+                    origin=full_model_name,
+                )
+                schema_records.extend(dependency_records)
 
-            for record in base_model_records:
-                dependency_records = self.process_schema(
-                    full_model_name=f'{reverse_app_name}.{reverse_model_name}',
-                    filter_key=reverse_relation.field.name,
+            for target_field in target_fields:
+                full_name = f'{target_field.app_name}.{target_field.model_name}'
+                dependency_records = self.process_declared_fields(
+                    full_model_name=full_name,
+                    filter_key=target_field.field_name,
                     filter_value=record['id'],
-                    output_dir=output_dir,
+                    history=history,
+                    origin=full_model_name,
                 )
                 schema_records.extend(dependency_records)
 
