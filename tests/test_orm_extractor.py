@@ -2,14 +2,13 @@ import pytest
 
 from fixtures_extractor.enums import FieldType
 from fixtures_extractor.orm_extractor import ModelFieldMetaDTO, ORMExtractor
-from tests.testproject.testapp.models import Album, Artist, Song, RecordLabel
 
 
 @pytest.mark.parametrize(
-    "Model, expected_fields",
+    "app_name, expected_fields",
     [
         (
-            Artist,
+            "testapp.Artist",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -52,7 +51,7 @@ from tests.testproject.testapp.models import Album, Artist, Song, RecordLabel
             ],
         ),
         (
-            Album,
+            "testapp.Album",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -90,11 +89,11 @@ from tests.testproject.testapp.models import Album, Artist, Song, RecordLabel
                     field_name="record_label",
                     model_name="recordlabel",
                     field_type=FieldType.foreign_key,
-                )
+                ),
             ],
         ),
         (
-            Song,
+            "testapp.Song",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -130,19 +129,19 @@ from tests.testproject.testapp.models import Album, Artist, Song, RecordLabel
         ),
     ],
 )
-def test_get_all_fields(Model, expected_fields):
+def test_get_all_fields(app_name, expected_fields):
     orm_extractor = ORMExtractor()
 
-    fields_names = orm_extractor.get_all_fields(Model=Model)
+    fields_names = orm_extractor.get_all_fields(app_model=app_name)
 
     assert sorted(fields_names) == sorted(expected_fields)
 
 
 @pytest.mark.parametrize(
-    "Model, expected_model_fields",
+    "app_name, expected_model_fields",
     [
         (
-            Artist,
+            "testapp.Artist",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -171,7 +170,7 @@ def test_get_all_fields(Model, expected_fields):
             ],
         ),
         (
-            Album,
+            "testapp.Album",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -194,7 +193,7 @@ def test_get_all_fields(Model, expected_fields):
             ],
         ),
         (
-            Song,
+            "testapp.Song",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -218,19 +217,19 @@ def test_get_all_fields(Model, expected_fields):
         ),
     ],
 )
-def test_get_model_fields(Model, expected_model_fields):
+def test_get_model_fields(app_name, expected_model_fields):
     orm_extractor = ORMExtractor()
 
-    fields_names = orm_extractor.get_model_fields(Model=Model)
+    fields_names = orm_extractor.get_model_fields(app_model=app_name)
 
     assert sorted(fields_names) == sorted(expected_model_fields)
 
 
 @pytest.mark.parametrize(
-    "Model, expected_m2m_fields",
+    "app_name, expected_m2m_fields",
     [
         (
-            Artist,
+            "testapp.Artist",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -241,9 +240,9 @@ def test_get_model_fields(Model, expected_model_fields):
                 )
             ],
         ),
-        (Album, []),
+        ("testapp.Album", []),
         (
-            Song,
+            "testapp.Song",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -255,19 +254,19 @@ def test_get_model_fields(Model, expected_model_fields):
         ),
     ],
 )
-def test_get_many_to_many_relations(Model, expected_m2m_fields):
+def test_get_many_to_many_relations(app_name, expected_m2m_fields):
     orm_extractor = ORMExtractor()
 
-    m2m_fields_names = orm_extractor.get_many_to_many_relations(Model=Model)
+    m2m_fields_names = orm_extractor.get_many_to_many_relations(app_model=app_name)
 
     assert sorted(m2m_fields_names) == sorted(expected_m2m_fields)
 
 
 @pytest.mark.parametrize(
-    "Model, expected_relation_fields",
+    "app_name, expected_relation_fields",
     [
         (
-            Artist,
+            "testapp.Artist",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -279,7 +278,7 @@ def test_get_many_to_many_relations(Model, expected_m2m_fields):
             ],
         ),
         (
-            Album,
+            "testapp.Album",
             [
                 ModelFieldMetaDTO(
                     app_name="testapp",
@@ -290,13 +289,13 @@ def test_get_many_to_many_relations(Model, expected_m2m_fields):
                 )
             ],
         ),
-        (Song, []),
+        ("testapp.Song", []),
     ],
 )
-def test_get_reverse_relations(Model, expected_relation_fields):
+def test_get_reverse_relations(app_name, expected_relation_fields):
     orm_extractor = ORMExtractor()
 
-    reverse_relations = orm_extractor.get_reverse_relations(Model=Model)
+    reverse_relations = orm_extractor.get_reverse_relations(app_model=app_name)
 
     assert sorted(reverse_relations) == sorted(expected_relation_fields)
 
@@ -399,6 +398,8 @@ def test_get_model_declared_relations(app_model, expected_model_declared_relatio
 def test_get_model_target_relations(app_model, expected_model_target_relations):
     orm_extractor = ORMExtractor()
 
-    model_target_relations = orm_extractor.get_model_target_relations(app_model)
+    model_target_relations = orm_extractor.get_model_target_relations(
+        app_model=app_model
+    )
 
     assert sorted(model_target_relations) == sorted(expected_model_target_relations)
