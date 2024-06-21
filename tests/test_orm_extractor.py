@@ -2,7 +2,6 @@ import pytest
 
 from fixtures_extractor.enums import FieldType
 from fixtures_extractor.orm_extractor import ModelFieldMetaDTO, ORMExtractor
-from tests.testproject.testapp.models import Album, Artist, Song, RecordLabel
 
 
 @pytest.mark.parametrize(
