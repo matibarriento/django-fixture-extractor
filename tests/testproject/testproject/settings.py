@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'tests.testproject.testapp',
+    'tests.testproject.eventol',
     'fixtures_extractor',
 ]
 
