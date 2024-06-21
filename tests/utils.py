@@ -17,4 +17,4 @@ def assert_fixture_output_file(output_file: Path, expected_json: list):
 
     assert output_json == expected_json, (output_json, expected_json)
 
-    call_command('loaddata', output_file)
+    call_command("loaddata", output_file)

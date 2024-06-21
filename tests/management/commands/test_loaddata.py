@@ -5,7 +5,7 @@ from django.core.management import call_command
 from django.core.serializers.base import DeserializationError
 
 from tests.testproject.testapp.factories import ArtistFactory, AlbumFactory
-from tests.management.commands.utils import date_repr
+from tests.utils import date_repr
 from tests.testproject.testapp.models import Artist, Album
 
 pytestmark = [pytest.mark.django_db]
