@@ -6,7 +6,6 @@ import argparse
 import logging
 from pathlib import Path
 
-import yaml
 from django.core.management.base import BaseCommand
 
 from fixtures_extractor.extra_logging_formatter import ExtraFormatter
