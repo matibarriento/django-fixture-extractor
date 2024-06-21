@@ -4,23 +4,25 @@ from pathlib import Path
 
 from django.apps import apps
 
+from fixtures_extractor.dtos import ModelFieldMetaDTO
 from fixtures_extractor.encoders import EnhancedDjangoJSONEncoder
+from fixtures_extractor.enums import FieldType
 
-logger = logging.getLogger("extract_fixture_with_schema")
+logger = logging.getLogger()
 
 
 class ORMExtractor:
     def get_records(self, app_model: str, filter_key: str, filter_value: str):
-        # noinspection PyPep8Naming
-        Model = apps.get_model(app_model)
-        fields = self.get_fields(Model)
+        model = apps.get_model(app_model)
+        fields = self.get_model_fields(model)
+        field_names = [field.field_name for field in fields]
 
-        records = Model.objects.all()
+        records = model.objects.all()
 
         if filter_key:
             records = records.filter(**{filter_key: filter_value}).all()
 
-        return records.values(*fields)
+        return records.values(*field_names)
 
     def dump_records(self, records: list, output_file: Path):
         logger.info(output_file)
@@ -41,20 +43,46 @@ class ORMExtractor:
 
         return results
 
-    def get_all_model_attributes(self, Model):
-        return (
-            self.get_fields(Model)
-            + self.get_many_to_many_relations(Model)
-            + self.get_reverse_relations(Model)
+    def get_all_fields(self, Model):
+        return sorted(
+            [ModelFieldMetaDTO.build(field) for field in Model._meta.get_fields()]
         )
 
-    def get_fields(self, Model):
-        return [field.name for field in Model._meta.fields]
-
-    def get_many_to_many_relations(self, Model):
-        return [m2m.name for m2m in Model._meta.many_to_many]
-
-    def get_reverse_relations(self, Model):
+    def get_model_fields(self, Model) -> list[ModelFieldMetaDTO]:
         return [
-            relation.get_accessor_name() for relation in Model._meta.related_objects
+            field
+            for field in self.get_all_fields(Model)
+            if field.field_type == FieldType.field
+        ]
+
+    def get_many_to_many_relations(self, Model) -> list[ModelFieldMetaDTO]:
+        return [
+            field
+            for field in self.get_all_fields(Model)
+            if field.field_type == FieldType.many_to_many
+        ]
+
+    def get_reverse_relations(self, Model) -> list[ModelFieldMetaDTO]:
+        return [
+            field
+            for field in self.get_all_fields(Model)
+            if field.field_type == FieldType.reverse_foreign_key
+        ]
+
+    def get_model_declared_relations(self, app_model) -> list[ModelFieldMetaDTO]:
+        model = apps.get_model(app_model)
+
+        return [
+            field
+            for field in self.get_all_fields(model)
+            if field.is_model_declared and field.field_type != FieldType.field
+        ]
+
+    def get_model_target_relations(self, app_model) -> list[ModelFieldMetaDTO]:
+        model = apps.get_model(app_model)
+
+        return [
+            field
+            for field in self.get_all_fields(model)
+            if not field.is_model_declared and field.field_type != FieldType.field
         ]
