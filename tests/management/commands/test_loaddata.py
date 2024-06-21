@@ -4,7 +4,11 @@ import pytest
 from django.core.management import call_command
 from django.core.serializers.base import DeserializationError
 
-from tests.testproject.testapp.factories import ArtistFactory, AlbumFactory
+from tests.testproject.testapp.factories import (
+    ArtistFactory,
+    AlbumFactory,
+    RecordLabelFactory,
+)
 from tests.management.commands.utils import date_repr
 from tests.testproject.testapp.models import Artist, Album, RecordLabel
 
@@ -48,7 +52,12 @@ def test_complex_fixture(tmp_path):
     fixture_file = tmp_path / "fixture.json"
 
     expected_artist = ArtistFactory.build(id=1)
-    expected_album = AlbumFactory.build(id=1, artist=expected_artist)
+    expected_record_label = RecordLabelFactory.build(id=1)
+    expected_album = AlbumFactory.build(
+        id=1,
+        artist=expected_artist,
+        record_label=expected_record_label,
+    )
     expected_record_label = expected_album.record_label
 
     # Sanity check
@@ -64,7 +73,7 @@ def test_complex_fixture(tmp_path):
                 "artist": expected_album.artist_id,
                 "name": expected_album.name,
                 "release_date": date_repr(expected_album.release_date),
-                "record_label": expected_album.record_label_id
+                "record_label": expected_album.record_label_id,
             },
         },
         {
@@ -74,6 +83,13 @@ def test_complex_fixture(tmp_path):
                 "first_name": expected_artist.first_name,
                 "last_name": expected_artist.last_name,
                 "instrument": expected_artist.instrument,
+            },
+        },
+        {
+            "model": "testapp.recordlabel",
+            "fields": {
+                "id": expected_record_label.id,
+                "name": expected_record_label.name,
             },
         },
     ]
