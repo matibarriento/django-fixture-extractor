@@ -1,1 +1,3 @@
 -r requirements.txt
+-r requirements_test.txt
+flit==3.9.0

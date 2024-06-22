@@ -1,11 +1,21 @@
--r requirements.txt
-pytest>=7.3.1
-pytest-django>=4.5.2
-coverage>=7.2.3
-mock>=1.0.1
-flake8>=2.1.0
-tox>=4.4.12
-factory-boy>=3.2.1
-pdbpp==0.10.3
-pytest-cov==4.0.0
-pillow==10.3.0
+# -r requirements.txt
+# pytest>=7.3.1
+# pytest-django>=4.5.2
+# coverage>=7.2.3
+# mock>=1.0.1
+# flake8>=2.1.0
+# tox>=4.4.12
+# factory-boy>=3.2.1
+# pdbpp==0.10.3
+# pytest-cov>=4.0.0
+# pillow==10.3.0
+pytest
+pytest-django
+coverage
+mock
+flake8
+tox
+factory-boy
+pdbpp
+pytest-cov
+pillow
