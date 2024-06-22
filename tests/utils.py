@@ -1,12 +1,17 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 from django.core.management import call_command
 
 
-def date_repr(field_date: date):
-    return field_date.strftime("%Y-%m-%d")
+def date_repr(field_date: date, format: str = "%Y-%m-%d"):
+    return field_date.strftime(format)
+
+
+def datetime_repr(field_datetime: datetime):
+    truncated_microseconds = field_datetime.strftime("%f")[:3]
+    return field_datetime.strftime("%Y-%m-%dT%H:%M:%S.") + truncated_microseconds + "Z"
 
 
 def assert_fixture_output_file(output_file: Path, expected_json: list):

@@ -35,13 +35,16 @@ Add it to your `INSTALLED_APPS`:
         ...
     )
 
-Features
---------
+TODO Features
+-------------
+* Make pipinstallable
+* Run CI/CD
 
+Desired features
+----------------
+* Add support for Django 1.11 to 5
 * Add supported model fields
-    * Many to Many
     * Many to Many with `through <https://docs.djangoproject.com/en/4.2/ref/models/fields/#django.db.models.ManyToManyField.through>`_ model
-* Make more tests
 * Add feature: Obfuscate value
 * Add feature: Generate schema from model
 * Fix tox and pyenv to work together
@@ -65,16 +68,6 @@ Development commands
     pip install -r requirements/requirements_dev.txt
     pip install -r requirements/requirements_test.txt
 
-Credits
--------
-
-Tools used in rendering this package:
-
-*  Cookiecutter_
-*  `cookiecutter-djangopackage`_
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`cookiecutter-djangopackage`: https://github.com/pydanny/cookiecutter-djangopackage
 
 How to add a new app and add tests
 ----------------------------------
@@ -92,3 +85,17 @@ How to add a new app and add tests
 5. Create the migrations using :code:`python manage.py makemigrations {APP_NAME}`
 6. Run the migrations using :code:`python manage.py migrate`
 7. Create the tests inside the :code:`tests/tests_orm_extractor.py` file
+
+Credits
+-------
+
+Based on https://github.com/ascaliaio/django-dumpdata-one
+
+Tools used in rendering this package:
+
+*  Cookiecutter_
+*  `cookiecutter-djangopackage`_
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`cookiecutter-djangopackage`: https://github.com/pydanny/cookiecutter-djangopackage
+

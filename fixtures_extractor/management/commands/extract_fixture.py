@@ -1,7 +1,3 @@
-"""
-Based on https://github.com/ascaliaio/django-dumpdata-one
-"""
-
 import logging
 from pathlib import Path
 
@@ -66,7 +62,7 @@ class Command(BaseCommand):
             primary_output_dir.mkdir(parents=True, exist_ok=True)
             output_file = primary_output_dir.joinpath(f"{full_model_name}.json")
 
-            records = self.process_declared_fields(
+            records = self.process_fields(
                 full_model_name=full_model_name,
                 filter_key=filter_key,
                 filter_value=str(primary_id),
@@ -76,7 +72,7 @@ class Command(BaseCommand):
 
             orm_extractor.dump_records(output_file=output_file, records=records)
 
-    def process_declared_fields(
+    def process_fields(
         self,
         full_model_name: str,
         filter_key: str,
@@ -84,12 +80,14 @@ class Command(BaseCommand):
         history: list,
         origin: str,
     ) -> list:
-        print(history)
+        logger.debug((origin, full_model_name, filter_key, filter_value))
         if (origin, full_model_name, filter_key, filter_value) in history:
+            logger.debug("----Skipped----")
             return []
 
-        schema_records = []
+        logger.debug("----Processing----")
         history.append((origin, full_model_name, filter_key, filter_value))
+        schema_records = []
 
         base_model_records = orm_extractor.get_records(
             app_model=full_model_name, filter_key=filter_key, filter_value=filter_value
@@ -99,7 +97,10 @@ class Command(BaseCommand):
         )
         schema_records.extend(jsonfy_records)
 
-        declared_fields = orm_extractor.get_model_declared_relations(
+        one_declared_fields = orm_extractor.get_model_declared_one_relations(
+            app_model=full_model_name
+        )
+        many_declared_fields = orm_extractor.get_model_declared_many_relations(
             app_model=full_model_name
         )
         target_fields = orm_extractor.get_model_target_relations(
@@ -107,26 +108,43 @@ class Command(BaseCommand):
         )
 
         for record in base_model_records:
-            for declared_field in declared_fields:
-                full_name = f"{declared_field.app_name}.{declared_field.model_name}"
-                dependency_records = self.process_declared_fields(
+            for one_declared_field in one_declared_fields:
+                full_name = (
+                    f"{one_declared_field.app_name}.{one_declared_field.model_name}"
+                )
+                one_declared_records = self.process_fields(
                     full_model_name=full_name,
                     filter_key="id",
-                    filter_value=record[declared_field.field_name],
+                    filter_value=record[one_declared_field.field_name],
                     history=history,
                     origin=full_model_name,
                 )
-                schema_records.extend(dependency_records)
+                schema_records.extend(one_declared_records)
+
+            for many_declared_field in many_declared_fields:
+                full_name = (
+                    f"{many_declared_field.app_name}.{many_declared_field.model_name}"
+                )
+
+                for filter_value in record[many_declared_field.field_name]:
+                    many_declared_records = self.process_fields(
+                        full_model_name=full_name,
+                        filter_key="id",
+                        filter_value=filter_value,
+                        history=history,
+                        origin=full_model_name,
+                    )
+                    schema_records.extend(many_declared_records)
 
             for target_field in target_fields:
                 full_name = f"{target_field.app_name}.{target_field.model_name}"
-                dependency_records = self.process_declared_fields(
+                target_records = self.process_fields(
                     full_model_name=full_name,
                     filter_key=target_field.field_name,
                     filter_value=record["id"],
                     history=history,
                     origin=full_model_name,
                 )
-                schema_records.extend(dependency_records)
+                schema_records.extend(target_records)
 
         return schema_records

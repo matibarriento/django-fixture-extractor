@@ -2,7 +2,7 @@ from pathlib import Path
 import pytest
 from django.core.management import call_command
 
-from tests.management.commands.utils import (
+from tests.utils import (
     date_repr,
     get_json_from_file,
 )
@@ -93,29 +93,6 @@ def test_run_command_multiple_related_model(tmp_path):
             },
         },
     ]
-
-    # TODO Remove when dupes registry is implemented
-    expected_json.extend(
-        [
-            {
-                "model": "testapp.album",
-                "fields": {
-                    "id": album.id,
-                    "artist": album.artist.id,
-                    "name": album.name,
-                    "release_date": date_repr(album.release_date),
-                    "record_label": record_label.id,
-                },
-            },
-            {
-                "model": "testapp.recordlabel",
-                "fields": {
-                    "id": 1,
-                    "name": record_label.name,
-                },
-            },
-        ]
-    )
 
     expected_json = sorted(expected_json, key=lambda x: x["model"])
 
