@@ -56,9 +56,8 @@ def test_run_command_multiple_related_model(tmp_path):
     event_tag_2 = EventTagFactory.create()
     event_1 = EventFactory.create(tags=[event_tag_1, event_tag_2])
 
-    output_dir = "fixtures"
-    # output_dir = tmp_path / "fixtures"
-    # output_dir.mkdir()
+    output_dir = tmp_path / "fixtures"
+    output_dir.mkdir()
 
     options = {
         "app": "eventol",
