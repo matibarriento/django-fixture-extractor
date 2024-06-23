@@ -1,6 +1,7 @@
 import json
 import logging
 from pathlib import Path
+from typing import List
 
 from django.apps import apps
 
@@ -45,7 +46,7 @@ class ORMExtractor:
 
         return base_record_values
 
-    def dump_records(self, records: list, output_file: Path):
+    def dump_records(self, records: List, output_file: Path):
         def record_key(record):
             return (record["model"], record["fields"]["id"])
 
@@ -57,7 +58,7 @@ class ORMExtractor:
         with open(output_file, "w+") as output:
             output.writelines(jsonfy_records)
 
-    def build_records(self, app_model: str, records: list) -> list:
+    def build_records(self, app_model: str, records: List) -> list:
         results = []
         for item in records:
             values = {}
@@ -76,21 +77,21 @@ class ORMExtractor:
             [ModelFieldMetaDTO.build(field=field) for field in model._meta.get_fields()]
         )
 
-    def get_model_fields(self, app_model) -> list[ModelFieldMetaDTO]:
+    def get_model_fields(self, app_model) -> List[ModelFieldMetaDTO]:
         return [
             field
             for field in self.get_all_fields(app_model=app_model)
             if field.field_type == FieldType.field
         ]
 
-    def get_model_declared_many_relations(self, app_model) -> list[ModelFieldMetaDTO]:
+    def get_model_declared_many_relations(self, app_model) -> List[ModelFieldMetaDTO]:
         return [
             field
             for field in self.get_all_fields(app_model=app_model)
             if field.is_model_declared and field.field_type == FieldType.many_to_many
         ]
 
-    def get_model_declared_one_relations(self, app_model) -> list[ModelFieldMetaDTO]:
+    def get_model_declared_one_relations(self, app_model) -> List[ModelFieldMetaDTO]:
         return [
             field
             for field in self.get_all_fields(app_model=app_model)
@@ -98,7 +99,7 @@ class ORMExtractor:
             and field.field_type in [FieldType.one_to_one, FieldType.foreign_key]
         ]
 
-    def get_model_target_relations(self, app_model) -> list[ModelFieldMetaDTO]:
+    def get_model_target_relations(self, app_model) -> List[ModelFieldMetaDTO]:
         return [
             field
             for field in self.get_all_fields(app_model=app_model)

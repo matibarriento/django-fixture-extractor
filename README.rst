@@ -37,17 +37,14 @@ Add it to your `INSTALLED_APPS`:
 
 TODO Features
 -------------
-* Make pipinstallable
 * Run CI/CD
 
 Desired features
 ----------------
-* Add support for Django 1.11 to 5
 * Add supported model fields
     * Many to Many with `through <https://docs.djangoproject.com/en/4.2/ref/models/fields/#django.db.models.ManyToManyField.through>`_ model
 * Add feature: Obfuscate value
 * Add feature: Generate schema from model
-* Fix tox and pyenv to work together
 
 Running Tests
 -------------

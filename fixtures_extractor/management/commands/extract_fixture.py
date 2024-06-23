@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import List
 
 from django.core.management.base import BaseCommand
 
@@ -77,7 +78,7 @@ class Command(BaseCommand):
         full_model_name: str,
         filter_key: str,
         filter_value: str,
-        history: list,
+        history: List,
         origin: str,
     ) -> list:
         logger.debug((origin, full_model_name, filter_key, filter_value))

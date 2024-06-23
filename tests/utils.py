@@ -1,6 +1,7 @@
 import json
 from datetime import date, datetime
 from pathlib import Path
+from typing import List
 
 from django.core.management import call_command
 
@@ -14,7 +15,7 @@ def datetime_repr(field_datetime: datetime):
     return field_datetime.strftime("%Y-%m-%dT%H:%M:%S.") + truncated_microseconds + "Z"
 
 
-def assert_fixture_output_file(output_file: Path, expected_json: list):
+def assert_fixture_output_file(output_file: Path, expected_json: List):
     assert output_file.exists(), list(output_file.parent.glob("*"))
 
     with open(output_file, "r") as output_content:
