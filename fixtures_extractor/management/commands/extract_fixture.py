@@ -24,7 +24,6 @@ class Command(BaseCommand):
             "--app",
             type=str,
             help="App of the start model to dump",
-            required=True,
         )
         parser.add_argument(
             "-m",
