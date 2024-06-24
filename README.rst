@@ -37,13 +37,13 @@ Add it to your `INSTALLED_APPS`:
 
 TODO Features
 -------------
-* Run CI/CD
+* Add feature: Support config params
+* Add feature: Obfuscate value
 
 Desired features
 ----------------
 * Add supported model fields
     * Many to Many with `through <https://docs.djangoproject.com/en/4.2/ref/models/fields/#django.db.models.ManyToManyField.through>`_ model
-* Add feature: Obfuscate value
 * Add feature: Generate schema from model
 
 Running Tests
@@ -63,7 +63,6 @@ Development commands
 ::
 
     pip install -r requirements/requirements_dev.txt
-    pip install -r requirements/requirements_test.txt
 
 
 How to add a new app and add tests
