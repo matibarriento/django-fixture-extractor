@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "django-fixtures-extractor"
-version = "0.1.1"
+version = "0.1.2"
 description = "Set of tools to extract fixtures from Django models navigating through the relationships of a given model to get a usable subset of the database."
 readme = "README.rst"
 readme-content-type = "text/x-rst"
@@ -18,7 +18,7 @@ classifiers = [
 dependencies = ["Django>=1.11"]
 
 [project.urls]
-"Homepage" = "https://github.com/matibarriento/fixtures_extractor"
+"Homepage" = "https://github.com/matibarriento/django-fixture-extractor"
 
 [tool.flit.module]
 name = "fixtures_extractor"
