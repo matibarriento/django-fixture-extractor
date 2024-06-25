@@ -2,15 +2,6 @@
 Django Fixtures Extractor
 =============================
 
-.. image:: https://badge.fury.io/py/django-fixtures-extractor.svg
-    :target: https://badge.fury.io/py/django-fixtures-extractor
-
-.. image:: https://travis-ci.org/matibarriento/django-fixtures-extractor.svg?branch=master
-    :target: https://travis-ci.org/matibarriento/django-fixtures-extractor
-
-.. image:: https://codecov.io/gh/matibarriento/django-fixtures-extractor/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/matibarriento/django-fixtures-extractor
-
 Extract specific data to a django fixture
 
 Documentation
