@@ -1,3 +1,4 @@
+from curses.ascii import islower
 import logging
 from math import log
 from shlex import join
@@ -63,11 +64,18 @@ class Command(BaseCommand):
         model_name = options.get("model")
         output_dir = Path(options.get("output_dir"))
 
-        logger.info(f"Extracting fixtures for {app_name} into '{output_dir}' path")
+        logger.info(
+            f"Extracting fixtures for {app_name}.{model_name} into '{output_dir}' path"
+        )
 
         filter_key = "id"
         primary_ids: List = options.get("primary_ids")
         logger.info(f"Filtering by {filter_key}={primary_ids}")
+
+        if not app_name.islower() or not model_name.islower():
+            logger.warning(
+                "App and model names should be lowercase, they will be lowercased for you"
+            )
 
         app_name = app_name.lower()
         model_name = model_name.lower()
