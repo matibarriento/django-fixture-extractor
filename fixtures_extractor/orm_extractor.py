@@ -1,5 +1,6 @@
 import json
 import logging
+from math import log
 from pathlib import Path
 from typing import List
 
@@ -9,11 +10,20 @@ from fixtures_extractor.dtos import ModelFieldMetaDTO
 from fixtures_extractor.encoders import EnhancedDjangoJSONEncoder
 from fixtures_extractor.enums import FieldType
 
-logger = logging.getLogger()
+logger = logging.getLogger(f"extract_fixture.{__name__}")
 
 
 class ORMExtractor:
     def get_records(self, app_model: str, filter_key: str, filter_value: str):
+        logger.debug(
+            f"Extracting records from {app_model} model with filter {filter_key}={filter_value}"
+        )
+
+        try:
+            model = apps.get_model(app_model)
+        except LookupError as ex:
+            raise ex
+
         fields = self.get_model_fields(app_model=app_model)
         field_names = [field.field_name for field in fields]
 
@@ -25,7 +35,6 @@ class ORMExtractor:
         )
         many_to_many_field_names = [field.field_name for field in many_to_many_fields]
 
-        model = apps.get_model(app_model)
         records = model.objects.all()
 
         if filter_key:
@@ -50,15 +59,25 @@ class ORMExtractor:
         def record_key(record):
             return (record["model"], record["fields"]["id"])
 
-        records = list({record_key(record): record for record in records}.values())
+        cleaned_records = list(
+            {record_key(record): record for record in records}.values()
+        )
 
-        logger.info(output_file)
+        if len(cleaned_records) < len(records):
+            logger.debug(
+                f"Found duplicated records in {len(records) - len(cleaned_records)} records"
+            )
 
-        jsonfy_records = json.dumps(records, cls=EnhancedDjangoJSONEncoder, indent=4)
+        logger.debug(f"Saving {output_file} file with {len(cleaned_records)} records")
+
+        jsonfy_records = json.dumps(
+            cleaned_records, cls=EnhancedDjangoJSONEncoder, indent=4
+        )
         with open(output_file, "w+") as output:
             output.writelines(jsonfy_records)
 
     def build_records(self, app_model: str, records: List) -> list:
+        logger.debug(f"Building records for {app_model} model")
         results = []
         for item in records:
             values = {}

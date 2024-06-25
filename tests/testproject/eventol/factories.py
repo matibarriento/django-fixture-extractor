@@ -13,7 +13,6 @@ def _generate_image(image_name: str = "image.jpg"):
 
     image_path = Path(f"{image_dir}{image_name}")
 
-    # if image_path.exists():
     return factory.django.ImageField(filename=str(image_path))
 
 
@@ -22,8 +21,8 @@ def _generate_file(file_name: str = "file.html"):
 
     file_path = Path(f"{file_dir}{file_name}")
 
-    # if file_path.exists():
     return factory.django.FileField(filename=str(file_path))
+
 
 
 class EventTagFactory(DjangoModelFactory):
