@@ -1,8 +1,4 @@
-from curses.ascii import islower
 import logging
-from math import log
-from shlex import join
-import sys
 from pathlib import Path
 from typing import List
 
@@ -35,13 +31,13 @@ class Command(BaseCommand):
             "-a",
             "--app",
             type=str,
-            help="App of the start model to dump",
+            help="App of the start model to dump, in lowercase",
         )
         parser.add_argument(
             "-m",
             "--model",
             type=str,
-            help="Name of the start model to dump",
+            help="Name of the start model to dump, in lowercase",
         )
         parser.add_argument(
             "primary_ids",
@@ -60,8 +56,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.setLevel(VERBOSITY[options.get("verbosity", 0)])
 
-        app_name = options.get("app")
-        model_name = options.get("model")
+        app_name: str = options.get("app")
+        model_name: str = options.get("model")
         output_dir = Path(options.get("output_dir"))
 
         logger.info(
