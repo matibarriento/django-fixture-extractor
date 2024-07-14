@@ -2,7 +2,67 @@ import pytest
 
 from fixtures_extractor.dtos import ModelFieldMetaDTO
 from fixtures_extractor.enums import FieldType
+from fixtures_extractor.obfuscator.basic_obfuscator import BasicObfuscator
 from fixtures_extractor.orm_extractor import ORMExtractor
+from tests.testproject.testapp.factories import (
+    AlbumFactory,
+    ArtistFactory,
+    SongFactory,
+    RecordLabelFactory,
+)
+
+pytestmark = [pytest.mark.django_db]
+
+
+@pytest.mark.parametrize(
+    "app_model, model_factory, filter_key, expected_record_keys",
+    [
+        (
+            "testapp.artist",
+            ArtistFactory,
+            "id",
+            ["first_name", "id", "instrument", "last_name"],
+        ),
+        (
+            "testapp.album",
+            AlbumFactory,
+            "id",
+            ["id", "name", "release_date", "artist", "record_label"],
+        ),
+        (
+            "testapp.song",
+            SongFactory,
+            "id",
+            ["id", "name", "release_date", "album", "artists"],
+        ),
+        (
+            "testapp.recordlabel",
+            RecordLabelFactory,
+            "id",
+            ["id", "name"],
+        ),
+    ],
+)
+def test_get_records(
+    app_model,
+    model_factory,
+    filter_key,
+    expected_record_keys,
+):
+    check_instance = model_factory.create()
+    model_factory.create()
+
+    orm_extractor = ORMExtractor()
+    orm_extractor.set_obfuscator(BasicObfuscator())
+
+    records = orm_extractor.get_records(
+        app_model=app_model,
+        filter_key=filter_key,
+        filter_value=getattr(check_instance, filter_key),
+    )
+
+    assert len(records) == 1
+    assert list(records[0].keys()) == expected_record_keys
 
 
 @pytest.mark.parametrize(

@@ -1,19 +1,25 @@
 import json
 import logging
-from math import log
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from django.apps import apps
 
 from fixtures_extractor.dtos import ModelFieldMetaDTO
 from fixtures_extractor.encoders import EnhancedDjangoJSONEncoder
 from fixtures_extractor.enums import FieldType
+from fixtures_extractor.obfuscator.basic_obfuscator import BasicObfuscator
 
 logger = logging.getLogger(f"extract_fixture.{__name__}")
 
 
 class ORMExtractor:
+    def __init__(self):
+        self._obfuscator: Optional[BasicObfuscator] = None
+
+    def set_obfuscator(self, obfuscator):
+        self._obfuscator = obfuscator
+
     def get_records(self, app_model: str, filter_key: str, filter_value: str):
         logger.debug(
             f"Extracting records from {app_model} model with filter {filter_key}={filter_value}"
@@ -46,6 +52,13 @@ class ORMExtractor:
                 *one_relation_field_names,
             )
         )
+
+        if self._obfuscator:
+            for record in base_record_values:
+                for field in fields:
+                    record[field.field_name] = self._obfuscator.obfuscate(
+                        field=field, value=record[field.field_name]
+                    )
 
         for index, record in enumerate(records):
             for m2m_field_name in many_to_many_field_names:

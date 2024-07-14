@@ -5,6 +5,7 @@ from typing import List
 from django.core.management.base import BaseCommand
 
 from fixtures_extractor.extra_logging_formatter import ExtraFormatter
+from fixtures_extractor.obfuscator.basic_obfuscator import BasicObfuscator
 from fixtures_extractor.orm_extractor import ORMExtractor
 
 logger = logging.getLogger("extract_fixture")
@@ -53,6 +54,16 @@ class Command(BaseCommand):
             help="Output dir for all the resulted fixtures",
         )
 
+        ## Configuration params
+        parser.add_argument(
+            "-b",
+            "--basic-obfuscate",
+            type=bool,
+            default=False,
+            help="Run a basic obfuscation on more common sensitive fields",
+            required=False,
+        )
+
     def handle(self, *args, **options):
         logger.setLevel(VERBOSITY[options.get("verbosity", 0)])
 
@@ -77,6 +88,9 @@ class Command(BaseCommand):
         model_name = model_name.lower()
         full_model_name = f"{app_name}.{model_name}"
         logger.debug(f"Full model name: {full_model_name}")
+
+        obfuscator = None if not options.get("basic-obfuscate") else BasicObfuscator()
+        orm_extractor.set_obfuscator(obfuscator=obfuscator)
 
         for primary_id in primary_ids:
             try:
